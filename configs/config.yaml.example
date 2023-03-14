@@ -1,0 +1,57 @@
+logging:
+  # один из доступных:
+  #        50: "CRITICAL",
+  #        40: "ERROR",
+  #        30: "WARNING",
+  #        20: "INFO",
+  #        10: "DEBUG",
+  #        0: "NOTSET",
+  level: INFO
+  format: "<level>{level: <8}</level> <green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> <cyan>{name}</cyan>:<cyan>{function}</cyan> - <level>{message}</level>"
+  retention: 1 days
+  rotation: 1 days
+  path: ./logs/preprocessor_{time:YYYY-MM}.log
+
+
+chunking:
+    threshold_to_chunk_MB: 500
+    lines_per_chunked_file: 100000
+
+
+reading:
+    type: csv # csv/json/jsoneachrow/excel
+    path: input/ # directory or file
+    pandas_params: # [not required]
+        encoding: utf-8
+        delimiter: ","
+        on_bad_lines: skip
+        header: 0
+
+
+processing: # [not required]
+    mapping: # case-sensetive
+        nick: account.nick
+        phone: number
+    fields_to_append: [source, date_insert]
+    fields_with_static_values:
+        source: test.io
+        example_date: 2022-09-10
+        filename: test.csv
+    handlers: # order is important
+        lowerize:
+            - [nick]
+            - [account.email]
+    fields_to_drop: [id, spider_type, adapterType, name, firstName, lastName, unsubscribed, notes, ref, spider_operator_id, spider_last_message_at, spider_created_at, nick_userid_md5, customerId]
+
+
+writing:
+    type: jsoneachrow # csv/json/jsoneachrow
+    path: output/
+    path_to_processed: processed/
+    path_to_errors: processed/broken
+    valuable_fields: # [not required]
+        fields: [phone, nick]
+        rule: loyal
+        loyal_boundary_value: 1 
+    pandas_params: # [not required]
+        encoding: utf-8

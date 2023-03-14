@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  preprocessor:
+    image: etl-rc-1
+    build:
+      context: .
+    container_name: etl-rc-1
+    ports:
+      - "8265:8265"
+    volumes:
+      - ./configs:/app/configs
+      - ./logs:/app/logs
+      - ./input:/app/input
+      - ./output:/app/output
+      - ./processed:/app/processed
+      - ./processed/broken:/app/processed/broken
+    command: bash -c "python main.py --config configs/config.yaml"
