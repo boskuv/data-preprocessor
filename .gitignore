@@ -145,13 +145,10 @@ cython_debug/
 
 # Custom
 TODO*
-*.yaml
+configs/
 *.csv
 *.json
 *.jsoneachrow
 *.xls*
 *.txt
 manifest
-input/
-output/
-processed/

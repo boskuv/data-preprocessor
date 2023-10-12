@@ -2,17 +2,17 @@ version: '3'
 
 services:
   preprocessor:
-    image: etl-rc-1
+    image: data-preprocessor
     build:
       context: .
-    container_name: etl-rc-1
+    container_name: data-preprocessor
     ports:
       - "8265:8265"
     volumes:
-      - ./configs:/app/configs
+      - ./config.yaml:/app/config.yaml
       - ./logs:/app/logs
       - ./input:/app/input
       - ./output:/app/output
       - ./processed:/app/processed
       - ./processed/broken:/app/processed/broken
-    command: bash -c "python main.py --config configs/config.yaml"
+    command: bash -c "python main.py --config config.yaml"

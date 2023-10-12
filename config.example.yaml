@@ -21,6 +21,7 @@ chunking:
 reading:
     type: csv # csv/json/jsoneachrow/excel
     path: input/ # directory or file
+    save_header: True # to save header from the file which was read firstly and apply it to other files
     pandas_params: # [not required]
         encoding: utf-8
         delimiter: ","
@@ -30,17 +31,23 @@ reading:
 
 processing: # [not required]
     mapping: # case-sensetive
-        nick: account.nick
+        nick: account.tg.username
+        adapterUserId: account.tg.id
+        email: account.other.email
         phone: number
-    fields_to_append: [source, date_insert]
+    fields_to_append: [source, date_leak, date_insert]
     fields_with_static_values:
-        source: test.io
-        example_date: 2022-09-10
-        filename: test.csv
+        source: autozs.ru
+        example: 2022-09-10
+        filename: autozs.csv
     handlers: # order is important
-        lowerize:
+        to_lower: # handler from 'handlers' folder
             - [nick]
-            - [account.email]
+            - [account.other.email]
+        strip_trash_symbols:
+            - [fullname]
+        add_to_list:
+            - [account.tg.username, account.tg.id]
     fields_to_drop: [id, spider_type, adapterType, name, firstName, lastName, unsubscribed, notes, ref, spider_operator_id, spider_last_message_at, spider_created_at, nick_userid_md5, customerId]
 
 
@@ -50,7 +57,7 @@ writing:
     path_to_processed: processed/
     path_to_errors: processed/broken
     valuable_fields: # [not required]
-        fields: [phone, nick]
+        fields: [phone, name]
         rule: loyal
         loyal_boundary_value: 1 
     pandas_params: # [not required]

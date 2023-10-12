@@ -6,11 +6,6 @@ Python 3.10
 [docker]
 ____
 ## Quick Start
-- create directories: 
-  - /input
-  - /output
-  - /logs
-  - /processed/broken
 - cp config.yaml.example config.yaml
 - build a docker image, using `docker build -t <image_name> .` 
 - edit 'config.yaml', according to your target
@@ -30,6 +25,7 @@ ____
 
 - type `(required)`: type of input data (valid types: csv, json, jsoneachrow, excel) 
 - path `(required)`: path to input directory or file 
+- save_header: to save header from the file which was read firstly and apply it to other files `False is a default value`
 - pandas_params: arguments for pandas reading methods. For more details: [read_csv](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html) / [read_json](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_json.html) / [read_excel](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_excel.html)
 
 #### Example
@@ -37,6 +33,7 @@ ____
 reading:
     type: csv
     path: input/ 
+    save_header: True
     pandas_params:
         encoding: utf-8
         delimiter: "|"
@@ -56,16 +53,14 @@ reading:
 processing:
     mapping:
         database: db
-        date_of_leak: date_leak
-    fields_to_append: [phone]    
+    fields_to_append: [id]    
     fields_with_static_values:
         source: test_source
-        date_of_leak: 2022-09-10
     handlers:
         concat_fields: 
             - [name, other_info]
             - [name, number]
-        lowerize:
+        to_lower:
             - [name]
     fields_to_drop: [other_info]
 ```
@@ -86,52 +81,9 @@ writing:
     path_to_processed: processed/
     path_to_errors: processed/broken
     valuable_fields:
-        fields: [phone, name]
+        fields: [id, name]
         rule: loyal
         loyal_boundary_value: 1 
     pandas_params: 
         encoding: utf-8 
 ```
-____
-
-## Контрибьютинг
-
-Новые данные в главной ветке
-
-появляются только после успешного прохождения код-ревью , посредством мерджа.
-
-Перед каждым пушем `isort .` , а потом `black .`
-
-**ТРЕБОВАНИЯ ПРИ ДОБАВЛЕНИИ НОВЫХ ОБРАБОТЧИКОВ**  
-
-При добавлении новых групп обработчиков:
-1. В директории app/processing/handlers добавить группу <new_group_name>.py
-2. В файле `app/processing/handlers/__init__.py` добавить строку from .<new_group_name> import *
-3. Наполнить <new_group_name>.py необходимыми методами
-
-Желательно:
-- проверять вход на пустые значения для избежания лишних ошибок
-```
-from app.utils.common import if_not_null
-
-def convert_date_from_utc(date: str | datetime):
-    """
-    Перевод даты из формата UTC в гггг-мм-дд.
-    """   
-    if if_not_null(str(date)):
-   ...
-```
-
-Обязательно:
-- добавлять docstring в формате:
-```
-    """
-    Пример docstring.
-    """   
-```
-- в критичных местах использовать try/except
-
-Для отслеживания ошибок:
-- raise Exception(...) - обработка всего файла прекращается, он падает в ошибки
-- print(...) - вывод ошибки в консоль с продолжением обработки других строк
-- pass - ошибка игнорируется

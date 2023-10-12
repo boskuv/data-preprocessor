@@ -10,7 +10,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-
     options = resolve_cmd_args()
 
     path_to_configs = options.config
