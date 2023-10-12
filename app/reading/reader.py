@@ -9,6 +9,7 @@ class Reader:
         self.transfer_object = transfer_object
         self.__path = path
         self.__type = config["type"].lower()
+        self.__save_header = config["save_header"]
         self.__pandas_params = config["pandas_params"]
         self.__column_names = column_names
         self.__only_read = only_read
@@ -32,6 +33,14 @@ class Reader:
         if os.path.exists(self.__path):
             reader = self.__get_reader()
 
+            # add saved header to splitted csv files
+            if self.__type == "csv":
+                if len(self.__column_names) and self.__save_header:
+                    if "names" not in self.__pandas_params:
+                        self.__pandas_params.update(
+                            {"names": self.__column_names, "header": None}
+                        )
+
             if self.__only_read:
                 self.__pandas_params["nrows"] = 100
 
@@ -42,13 +51,11 @@ class Reader:
                     print(self.transfer_object.df)
                     print()
                 except Exception as ex:
-                    print(f"ERROR | {self.__class_name} | {ex}")
+                    print(f"{self.__class_name} | {ex}")
             else:
-                # add saved header to splitted csv files
-                if self.__type == "csv" and len(self.__column_names):
-                    self.__pandas_params.update(
-                        {"names": self.__column_names, "header": None}
-                    )
+                # delete 'nrows' param, got from validation step
+                self.__pandas_params.pop("nrows", None)
+
                 try:
                     self.transfer_object.df = reader(self.__path, self.__pandas_params)
                     self.transfer_object.intermediate_status = "OK"

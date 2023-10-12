@@ -3,12 +3,16 @@ import inspect
 import numpy as np
 from pandas import DataFrame
 from functools import wraps
+import os
+import contextlib
+from alive_progress import alive_bar
+
 
 from . import handlers
 
 
 class Processor:
-    def __init__(self, transfer_object, config):
+    def __init__(self, transfer_object, config, path_to_file):
         """Constructor Processor()
 
         Args:
@@ -18,6 +22,7 @@ class Processor:
             raise ValueError(transfer_object.message)
         self.transfer_object = transfer_object
         self.__config = config
+        # self.__path_to_file = path_to_file
         self.__class_name = self.__class__.__name__
 
     def check_none_df_decorator(process_df):
@@ -103,6 +108,23 @@ class Processor:
 
         return check_fields_repeats
 
+    def block_print_decorator(process_df):
+        """Decorator for blocking print() from handlers
+
+        Args:
+            process_df: decorated method for processing Dataframe
+        """
+
+        @wraps(process_df)
+        def block_print(*args):
+            if False:  # TODO: cmd flag
+                with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
+                    process_df(*args)
+            else:
+                process_df(*args)
+
+        return block_print
+
     def __if_fields_exist(self, config_columns, config_node_with_fields):
         """Check if fields from config exist and match to input
 
@@ -149,13 +171,12 @@ class Processor:
     @check_none_df_decorator
     def __add_fields_with_static_values(self):
         """Add fields with static(const) values"""
-        if self.__config["fields_with_static_values"] is not None:
-            self.transfer_object.df = self.transfer_object.df.assign(
-                **{
-                    column: str(self.__config["fields_with_static_values"][column])
-                    for column in list(set(self.__config["fields_with_static_values"]))
-                }
-            )
+        self.transfer_object.df = self.transfer_object.df.assign(
+            **{
+                column: str(self.__config["fields_with_static_values"][column])
+                for column in list(set(self.__config["fields_with_static_values"]))
+            }
+        )
 
     @check_none_df_decorator
     @map_fields_decorator
@@ -188,6 +209,7 @@ class Processor:
     @check_none_df_decorator
     @repeats_decorator
     @map_fields_decorator
+    @block_print_decorator
     def __apply(self, handler_args, handler_name):
         """Handle dataframe column with specific methods from 'handlers.py'
 
@@ -218,11 +240,16 @@ class Processor:
 
                 self.__add_fields_with_static_values()
 
-                for method, fields_for_processing in self.__config["handlers"].items():
-                    if self.__if_method_exists(method):
-                        for args in fields_for_processing:
-                            if self.__if_fields_exist(args, "handlers"):
-                                self.__apply(args, method)
+                print("HANDLING STATUS:")
+                with alive_bar(len(self.__config["handlers"])) as bar:
+                    for method, fields_for_processing in self.__config[
+                        "handlers"
+                    ].items():
+                        if self.__if_method_exists(method):
+                            for args in fields_for_processing:
+                                if self.__if_fields_exist(args, "handlers"):
+                                    self.__apply(args, method)
+                        bar()
 
                 if self.__if_fields_exist(
                     self.__config["fields_to_drop"], "fields_to_drop"
@@ -234,7 +261,7 @@ class Processor:
                 )
 
                 # delete columns filled with NaN values
-                self.transfer_object.df.dropna(axis=1, how="all", inplace=True)
+                # self.transfer_object.df.dropna(axis=1, how="all", inplace=True)
 
                 self.transfer_object.df.drop_duplicates(keep=False, inplace=True)
 

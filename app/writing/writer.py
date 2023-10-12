@@ -27,7 +27,10 @@ class Writer:
             pass
 
         if self.transfer_object.is_chunked:
-            self.__output_directory = os.path.join(self.__output_directory, "tmp")
+            source_filemame = filename[: filename.rfind("_")]
+            self.__output_directory = os.path.join(
+                self.__output_directory, f"tmp_{source_filemame}"
+            )
 
         if not os.path.exists(self.__output_directory):
             os.makedirs(self.__output_directory)

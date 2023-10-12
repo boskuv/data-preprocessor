@@ -31,24 +31,17 @@ reading:
 
 processing: # [not required]
     mapping: # case-sensetive
-        nick: account.tg.username
-        adapterUserId: account.tg.id
-        email: account.other.email
-        phone: number
-    fields_to_append: [source, date_leak, date_insert]
+        nick: nickname
+    fields_to_append: [source, date_insert]
     fields_with_static_values:
-        source: autozs.ru
-        example: 2022-09-10
-        filename: autozs.csv
+        example_date: 2022-09-10
+        filename: test
     handlers: # order is important
         to_lower: # handler from 'handlers' folder
             - [nick]
-            - [account.other.email]
-        strip_trash_symbols:
-            - [fullname]
         add_to_list:
-            - [account.tg.username, account.tg.id]
-    fields_to_drop: [id, spider_type, adapterType, name, firstName, lastName, unsubscribed, notes, ref, spider_operator_id, spider_last_message_at, spider_created_at, nick_userid_md5, customerId]
+            - [source, date_insert]
+    fields_to_drop: [id, adapterType, nick_userid_md5]
 
 
 writing:
@@ -57,7 +50,7 @@ writing:
     path_to_processed: processed/
     path_to_errors: processed/broken
     valuable_fields: # [not required]
-        fields: [phone, name]
+        fields: [source, nickname]
         rule: loyal
         loyal_boundary_value: 1 
     pandas_params: # [not required]

@@ -1,5 +1,6 @@
 from inspect import signature
 import math
+import ast
 
 
 def if_not_null(value):
@@ -13,6 +14,13 @@ def if_not_null(value):
         return False
     else:
         return True
+
+
+def eval_list(value):
+    if isinstance(value, str) and len(value) > 2:
+        if value[0] == "[" and value[-1] == "]":
+            return ast.literal_eval(value)
+    return value
 
 
 def if_pandas_params_exist(mode, passed_params, real_params):

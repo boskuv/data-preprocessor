@@ -7,9 +7,6 @@ extractor = URLExtract()
 
 
 def extract_url_from_line(text: str) -> str:
-    """
-    Извлечение url из текста
-    """
     try:
         if len(extractor.find_urls(text)):
             return str(extractor.find_urls(text)[0])
@@ -18,9 +15,6 @@ def extract_url_from_line(text: str) -> str:
 
 
 def delete_url_from_line(text: str) -> str:
-    """
-    Удаление url из текста
-    """
     if if_not_null(str(text)):
         try:
             extracted_url = extract_url_from_line(text)

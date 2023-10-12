@@ -9,9 +9,6 @@ parser = optparse.OptionParser(usage="Usage: %prog [options]")
 
 parser.add_option("-c", "--config", type=str, help="path to configuration file")
 
-parser.add_option(
-    "--only_read", action="store_true", default=False, help="try to read the file"
-)
 
 passed_args = [arg for arg in sys.argv]
 

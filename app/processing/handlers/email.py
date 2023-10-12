@@ -8,10 +8,7 @@ email_pattern = compile(r"\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6}", IGNORECASE)
 
 
 def extract_email(email: str) -> str:
-    """
-    Извлечение email-адреса по регулярному выражению
-    """
     if if_not_null(str(email)):
         email = str(email).strip()
-        match = email_pattern.match(email)
-        return match.group() if match else np.NaN
+        match = email_pattern.findall(email)
+        return match[0] if len(match) and len(email.split("@")[0]) > 2 else np.NaN

@@ -45,6 +45,7 @@ class ReadingConfig(BaseConfig, BaseSettings):
 
     type: Literal["csv", "json", "jsoneachrow", "excel"]
     path: str
+    save_header: bool = False
     pandas_params: Optional[Dict] = dict()
 
 
@@ -104,6 +105,7 @@ def get_configs_from_directory(configurations_path: str) -> List:
         return [
             os.path.join(configurations_path, config_filename)
             for config_filename in os.listdir(configurations_path)
+            if os.path.isfile(os.path.join(configurations_path, config_filename))
         ]
     else:
         return [configurations_path]

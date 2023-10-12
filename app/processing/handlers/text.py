@@ -5,18 +5,12 @@ from app.utils.common import if_not_null
 
 
 def print_value(text: str):
-    """
-    Напечатать в консоль значение из ячейки
-    """
     if if_not_null(str(text)):
         print(text)
         print()
 
 
 def add_to_list(*args) -> list:
-    """
-    Добавить значения из ячеек в список [.., .., ..]
-    """
     try:
         result = [str(arg) for arg in args if if_not_null(str(arg))]
         if len(result):
@@ -28,9 +22,6 @@ def add_to_list(*args) -> list:
 
 
 def concat_fields(*args) -> str:
-    """
-    Склеивание строк
-    """
     result = " ".join(
         [
             str(arg).strip()
@@ -42,18 +33,12 @@ def concat_fields(*args) -> str:
 
 
 def leave_only_digits_in_line(text: str) -> str:
-    """
-    Оставить только цифры в строке
-    """
     if if_not_null(str(text)):
         if len(re.findall("\d+", text)):
             return "".join(re.findall("\d+", text)[0])
 
 
 def to_string(text: str) -> str:
-    """
-    Приведение к строковому типу
-    """
     try:
         return str(text)
     except Exception as ex:
@@ -61,9 +46,6 @@ def to_string(text: str) -> str:
 
 
 def to_lower(text: str) -> str:
-    """
-    Приведение к нижнему регистру
-    """
     if isinstance(text, str):
         try:
             return str(text).strip().lower()
@@ -72,9 +54,6 @@ def to_lower(text: str) -> str:
 
 
 def to_upper(text: str) -> str:
-    """
-    Приведение к верхнему регистру
-    """
     if isinstance(text, str):
         try:
             return str(text).strip().upper()
@@ -83,9 +62,6 @@ def to_upper(text: str) -> str:
 
 
 def remove_multiple_spaces(text: str) -> str:
-    """
-    Заменить множественные пробелы одинарными
-    """
     if isinstance(text, str):
         try:
             return re.sub(" {2,}", " ", text)
@@ -94,9 +70,6 @@ def remove_multiple_spaces(text: str) -> str:
 
 
 def rstrip_digits(text: str) -> str:
-    """
-    Удалить все цифры с правой части строки
-    """
     if isinstance(text, str):
         try:
             return text.rstrip("0123456789 ")
@@ -105,9 +78,6 @@ def rstrip_digits(text: str) -> str:
 
 
 def lstrip_digits(text: str) -> str:
-    """
-    Удалить все цифры с правой части строки
-    """
     if if_not_null(str(text)):
         try:
             return text.lstrip("0123456789 ")
@@ -116,9 +86,6 @@ def lstrip_digits(text: str) -> str:
 
 
 def strip_digits(text: str) -> str:
-    """
-    Удалить все цифры с обеих сторон строки
-    """
     if if_not_null(str(text)):
         try:
             return text.strip("0123456789 ")
@@ -127,9 +94,6 @@ def strip_digits(text: str) -> str:
 
 
 def strip_trash_symbols(text: str) -> str:
-    """
-    Удалить все служебные символы с обеих сторон строки
-    """
     if if_not_null(str(text)):
         try:
             return text.strip("'.\,-=?!#:;^& ")
@@ -138,9 +102,6 @@ def strip_trash_symbols(text: str) -> str:
 
 
 def remove_html_special_symbols(text: str) -> str:
-    """
-    Удалить специальные html символы
-    """
     try:
         if if_not_null(text):
             reserved_chars = [
